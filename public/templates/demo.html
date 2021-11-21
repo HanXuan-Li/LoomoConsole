@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My first three.js app</title>
+    <style>
+        body {
+            margin: 0;
+        }
+
+    </style>
+
+    <style>
+        #c {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+            z-index: -1;
+        }
+
+        *[data-diagram] {
+            display: inline-block;
+            width: 500px;
+            height: 390px;
+        }
+
+        .left {
+            float: left;
+            margin-right: .25em;
+        }
+
+        .right {
+            float: right;
+            margin-left: .25em;
+        }
+
+        p {
+            margin: 1em auto;
+            max-width: 500px;
+            font-size: xx-large;
+        }
+    </style>
+
+
+</head>
+
+<body>
+<style>
+    #canvas {
+        width: 400px;
+        height: 300px;
+        margin: 100px;
+        padding: 0px;
+        position: static; /* fixed or static */
+        top: 100px;
+        left: 100px;
+    }
+</style>
+<canvas id="c"></canvas>
+<span data-diagram="scannet1"></span>
+<span data-diagram="scannet2"></span>
+<img style="height:390px" id = "img">
+<script>
+    document.getElementById('img').src="http://10.208.40.12:5000/get_seg?"+Math.random();
+</script>
+<!--<span data-diagram="box" class="left"></span>-->
+<!--<span data-diagram="pyramid" class="right"></span>-->
+
+<!-- <span id="pyramid" class="diagram"></span> -->
+<!-- <span id="pyramid" class="canvas"></span> -->
+
+<!-- <div id="info">Description</div> -->
+<!-- <style>
+    #info {
+    position: absolute;
+    top: 10px;
+    width: 100%;
+    text-align: center;
+    z-index: 100;
+    display:block;
+    color: brown;
+}
+</style> -->
+<!-- <div id="canvas"></div> -->
+
+
+<script src="../static/js/three.js"></script>
+<script src="../static/js/three.js"></script>
+<script src="../static/js/PLYLoader.js"></script>
+<script src="../static/js/OrbitControls.js"></script>
+<script src="../static/js/TrackballControls.js"></script>
+<script src="../static/js/stats.min.js"></script>
+<script src="../static/js/dat.gui.min.js"></script>
+
+<script type="module">
+    function main() {
+        const canvas = document.querySelector('#c');
+        const renderer = new THREE.WebGLRenderer({canvas, alpha: true});
+
+        const sceneElements = [];
+
+        function addScene(elem, fn) {
+            sceneElements.push({elem, fn});
+        }
+
+        function makeScene(elem) {
+            const scene = new THREE.Scene();
+
+            const fov = 75;
+            const aspect = 2;  // the canvas default
+            const near = 0.1;
+            const far = 1000;
+            const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+            camera.position.set(0, 1, 2);
+            camera.lookAt(0, 0, 0);
+            scene.add(camera);
+
+            const controls = new THREE.TrackballControls(camera, elem);
+            // controls.noZoom = true;
+            // controls.noPan = true;
+            // controls.enableDamping = true;
+            //动态阻尼系数 就是鼠标拖拽旋转灵敏度
+            //controls.dampingFactor = 0.25;
+            //是否可以缩放
+            controls.enableZoom = true;
+            //是否自动旋转
+            controls.autoRotate = true;
+            // controls.autoRotateSpeed = 0.5;
+            controls.autoRotateSpeed = 2.5;
+            //设置相机距离原点的最远距离
+            controls.minDistance = 1;
+            //设置相机距离原点的最远距离
+            controls.maxDistance = 200;
+            //是否开启右键拖拽
+            controls.enablePan = true;
+
+            {
+                const color = 0xFFFFFF;
+                const intensity = 1;
+                // const light = new THREE.DirectionalLight(color, intensity);
+                var light = new THREE.AmbientLight(0xffffff);
+				scene.add(light);
+                light.position.set(-1, 2, 4);
+                camera.add(light);
+            }
+
+            return {scene, camera, controls};
+        }
+
+        const sceneInitFunctionsByName = {
+            'scannet1': (elem) => {
+                const {scene, camera, controls} = makeScene(elem);
+
+
+                // const geometry = new THREE.BoxBufferGeometry(1, 1, 1);
+                // const material = new THREE.MeshPhongMaterial({color: 'red'});
+
+                var loader = new THREE.PLYLoader();
+                // loader.load("../static/models/scene0002_01_vh_clean_2_axis_aligned.ply", function (geometry) {
+                loader.load("http://10.29.51.108:7010/downsample_mesh/1.ply?"+Math.random(), function (geometry) {
+                    //loader.load("static/models/dolphins.ply", function (geometry) {
+
+                    //更新顶点的法向量
+                    geometry.computeVertexNormals();
+                    geometry.computeBoundingBox();
+                    geometry.translate(-((geometry.boundingBox.max.x - geometry.boundingBox.min.x) / 2 + geometry.boundingBox.min.x), -((geometry.boundingBox.max.y - geometry.boundingBox.min.y) / 2 + geometry.boundingBox.min.y), -((geometry.boundingBox.max.z - geometry.boundingBox.min.z) / 2 + geometry.boundingBox.min.z));
+
+                    //创建纹理，并将模型添加到场景道中
+                    var material = new THREE.MeshPhongMaterial({
+                        color: 0xffffff,
+                        specular: 0x111111,
+                        shininess: 200,
+                        vertexColors: THREE.VertexColors
+                    });
+                    var mesh = new THREE.Mesh(geometry, material);
+                    mesh.rotation.y = -0.2;
+                    mesh.rotation.x = -1;
+                    mesh.rotation.z = -1;
+                    mesh.scale.set(0.5, 0.5, 0.5);
+                    // mesh.scale.set(1, 1, 1);
+                    scene.add(mesh);
+                });
+
+                // const mesh = new THREE.Mesh(geometry, material);
+                // scene.add(mesh);
+                return (time, rect) => {
+                    // mesh.rotation.y = time * .1;
+                    camera.aspect = rect.width / rect.height;
+                    camera.updateProjectionMatrix();
+                    controls.handleResize();
+                    controls.update();
+                    renderer.render(scene, camera);
+                };
+            },
+            'scannet2': (elem) => {
+                const {scene, camera, controls} = makeScene(elem);
+
+
+                // const geometry = new THREE.BoxBufferGeometry(1, 1, 1);
+                // const material = new THREE.MeshPhongMaterial({color: 'red'});
+
+                var loader = new THREE.PLYLoader();
+                //loader.load("../static/models/scene0002_01_vh_clean_2_axis_aligned.ply", function (geometry) {
+                loader.load("http://10.208.40.12:5000/1.ply?"+Math.random(), function (geometry) {
+
+                    //更新顶点的法向量
+                    geometry.computeVertexNormals();
+                    geometry.computeBoundingBox();
+                    geometry.translate(-((geometry.boundingBox.max.x - geometry.boundingBox.min.x) / 2 + geometry.boundingBox.min.x), -((geometry.boundingBox.max.y - geometry.boundingBox.min.y) / 2 + geometry.boundingBox.min.y), -((geometry.boundingBox.max.z - geometry.boundingBox.min.z) / 2 + geometry.boundingBox.min.z));
+
+                    //创建纹理，并将模型添加到场景道中
+                    var material = new THREE.MeshPhongMaterial({
+                        color: 0xffffff,
+                        specular: 0x111111,
+                        shininess: 200,
+                        vertexColors: THREE.VertexColors
+                    });
+                    var mesh = new THREE.Mesh(geometry, material);
+                    mesh.rotation.y = -0.2;
+                    mesh.rotation.x = -1;
+                    mesh.rotation.z = -1;
+                    mesh.scale.set(0.5, 0.5, 0.5);
+                    // mesh.scale.set(1, 1, 1);
+                    scene.add(mesh);
+                });
+
+                // const mesh = new THREE.Mesh(geometry, material);
+                // scene.add(mesh);
+                return (time, rect) => {
+                    // mesh.rotation.y = time * .1;
+                    camera.aspect = rect.width / rect.height;
+                    camera.updateProjectionMatrix();
+                    controls.handleResize();
+                    controls.update();
+                    renderer.render(scene, camera);
+                };
+            },
+        };
+
+        document.querySelectorAll('[data-diagram]').forEach((elem) => {
+            const sceneName = elem.dataset.diagram;
+            const sceneInitFunction = sceneInitFunctionsByName[sceneName];
+            const sceneRenderFunction = sceneInitFunction(elem);
+            addScene(elem, sceneRenderFunction);
+        });
+
+        function resizeRendererToDisplaySize(renderer) {
+            const canvas = renderer.domElement;
+            const width = canvas.clientWidth;
+            const height = canvas.clientHeight;
+            const needResize = canvas.width !== width || canvas.height !== height;
+            if (needResize) {
+                renderer.setSize(width, height, false);
+            }
+            return needResize;
+        }
+
+        const clearColor = new THREE.Color('#000');
+
+        function render(time) {
+            time *= 0.001;
+
+            resizeRendererToDisplaySize(renderer);
+
+            renderer.setScissorTest(false);
+            renderer.setClearColor(clearColor, 0);
+            renderer.clear(true, true);
+            renderer.setScissorTest(true);
+
+            const transform = `translateY(${window.scrollY}px)`;
+            renderer.domElement.style.transform = transform;
+
+            for (const {elem, fn} of sceneElements) {
+                // get the viewport relative position of this element
+                const rect = elem.getBoundingClientRect();
+                const {left, right, top, bottom, width, height} = rect;
+
+                const isOffscreen =
+                    bottom < 0 ||
+                    top > renderer.domElement.clientHeight ||
+                    right <script 0 ||
+                    left > renderer.domElement.clientWidth;
+
+                if (!isOffscreen) {
+                    const positiveYUpBottom = renderer.domElement.clientHeight - bottom;
+                    renderer.setScissor(left, positiveYUpBottom, width, height);
+                    renderer.setViewport(left, positiveYUpBottom, width, height);
+
+                    fn(time, rect);
+                }
+            }
+
+            requestAnimationFrame(render);
+        }
+
+        requestAnimationFrame(render);
+    }
+
+    main();
+</script>
+
+
+</body>
+</html>
