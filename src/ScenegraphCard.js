@@ -5,6 +5,7 @@ import NewForceChart from './NewForceChart';
 import Test from './test';
 import ConnectLogo from './ConnectLogo'
 import Big_Force_chart from './BigForceChart';
+import ForceGraph_3D from './ForceGraph_3D';
 import { Drawer, Button } from 'antd';
 import {
     ZoomInOutlined,
@@ -51,13 +52,15 @@ class ScenegraphCard extends Component{
         </Card>
         <Drawer
         // title={"Basic Drawer"}
+        // <Force_chart width="1500" height="900" ref_name="Big" force_type = "big"/>
         width={1370}
         placement="right"
         closable={false}
         onClose={this.onClose}
         visible={this.state.visible}
         >
-        <Force_chart width="1500" height="900" ref_name="Big" force_type = "big"/>
+        <ForceGraph_3D />
+        
       </Drawer>
       </>
         )
