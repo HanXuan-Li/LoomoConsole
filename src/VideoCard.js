@@ -4,6 +4,7 @@ import ConnectLogo from './ConnectLogo'
 const { Meta } = Card;
 
 
+
 class VideoCard extends Component{
     constructor(props){
         super(props)
@@ -13,7 +14,7 @@ class VideoCard extends Component{
     }
 
     static defaultProps = {
-        src : "color_default.png",
+        src : "recon.jpg",
         style : {width : 400},
     }
 
@@ -23,10 +24,10 @@ class VideoCard extends Component{
             hoverable
             bordered = {true}
             style={this.props.style}
-            cover={<img width = "400" height="300" src = {this.props.src} onError={(e)=>{e.target.onerror = null; e.target.src="color_default.png"}} alt = "picturhaha"></img>}
+            cover={<img width = "400" height="300" src = {this.props.src} onError={(e)=>{e.target.onerror = null; e.target.src="recon.jpg"}} alt = "picturhaha"></img>}
         >
             <Meta 
-            // avatar={<ConnectLogo url={this.props.src}/>} 
+            avatar={<ConnectLogo url={this.props.src}/>} 
             title={this.props.card_name}/>
         </Card>
         )

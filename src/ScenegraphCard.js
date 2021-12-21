@@ -46,9 +46,9 @@ class ScenegraphCard extends Component{
             hoverable
             bordered = {true}
             style={this.props.width}
-            cover={<NewForceChart width="400" height="300" ref_name="Small" force_type = "small"/>}
+            cover={this.props.dim == "2d" ? <Force_chart width="400" height="300" ref_name="Small" force_type = "small"/> : <ForceGraph_3D width="400" height="300" ref_name="Small" force_type = "small"/>}
         >
-            <Meta avatar={<ConnectLogo url="http://10.29.150.45:7007/get_sg"/>} title={<>Scene Graph　　　 　　　 　　　　 　　<ZoomInOutlined type="primary" style = {{"color" : "#096dd9"}} onClick={this.showDrawer} /> </>}/> 
+            <Meta avatar={<ConnectLogo url="http://10.29.150.45:7007/get_sg"/>} title={<>{this.props.card_name}　　　 　　　　　　　<ZoomInOutlined type="primary" style = {{"color" : "#096dd9"}} onClick={this.showDrawer} /> </>}/> 
         </Card>
         <Drawer
         // title={"Basic Drawer"}

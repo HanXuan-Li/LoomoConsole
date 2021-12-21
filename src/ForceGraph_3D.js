@@ -86,6 +86,8 @@ class ForceGraph_3D extends Component{
         return <ForceGraph3D 
         // extraRenderers={extraRenderers} 
 
+        width={this.props.width}
+        height={this.props.height}
         graphData={this.state.data} 
         
         nodeColor = {node =>{
