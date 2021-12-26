@@ -33,7 +33,8 @@ class CarouselCard extends Component{
             hoverable
             bordered = {true}
             style={this.props.style}
-            cover={<Carousel autoplay>
+            // cover={<Carousel autoplay>
+            cover={<Carousel >
                 <div>
                 <img width = "400" height="300" src = {this.props.src1} onError={(e)=>{e.target.onerror = null; e.target.src="color.jpg"}} alt = "picturhaha"></img>
                 </div>

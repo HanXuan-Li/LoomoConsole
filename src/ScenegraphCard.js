@@ -7,6 +7,8 @@ import ConnectLogo from './ConnectLogo'
 import Big_Force_chart from './BigForceChart';
 import ForceGraph_3D from './ForceGraph_3D';
 import { Drawer, Button } from 'antd';
+import {message} from 'antd';
+import ForceGraph_3D_big from './ForceGraph_3D_big';
 import {
     ZoomInOutlined,
   } from '@ant-design/icons';
@@ -16,8 +18,8 @@ class ScenegraphCard extends Component{
     constructor(props){
         super(props)
         this.state={
-            connect:false,
-            visible:false
+            connect : false,
+            visible : false,
         }
     }
 
@@ -46,7 +48,7 @@ class ScenegraphCard extends Component{
             hoverable
             bordered = {true}
             style={this.props.width}
-            cover={this.props.dim == "2d" ? <Force_chart width="400" height="300" ref_name="Small" force_type = "small"/> : <ForceGraph_3D width="400" height="300" ref_name="Small" force_type = "small"/>}
+            cover={this.props.dim == "2d" ? <NewForceChart width="400" height="300" ref_name="Small" force_type = "small"/> : <ForceGraph_3D width="400" height="300" ref_name="Small" force_type = "small"/>}
         >
             <Meta avatar={<ConnectLogo url="http://10.29.150.45:7007/get_sg"/>} title={<>{this.props.card_name}　　　 　　　　　　　<ZoomInOutlined type="primary" style = {{"color" : "#096dd9"}} onClick={this.showDrawer} /> </>}/> 
         </Card>
@@ -58,9 +60,10 @@ class ScenegraphCard extends Component{
         closable={false}
         onClose={this.onClose}
         visible={this.state.visible}
+        // destroyOnClose = "true"
+        // forceRender = "true"
         >
-        <ForceGraph_3D />
-        
+        <ForceGraph_3D_big width="1500" height="900"/>
       </Drawer>
       </>
         )
